@@ -5,25 +5,35 @@ function render(element, content) {
   }
 }
 
-function reactive(obj){
-  const keys = Object.keys(obj)
-  const reactiveObj = {}
+function reactive(obj) {
+  const keys = Object.keys(obj);
+  const reactiveObj = {};
 
-  keys.forEach(key => {
-    let value = obj[key]
-    Object.defineProperty(reactiveObj, keys, {
-      get(){
-        console.log( `Getting value, ${value}`)
-        return value
+  keys.forEach((key) => {
+    let value = obj[key];
+    Object.defineProperty(reactiveObj, key, {
+      get() {
+        console.log(`Getting value, ${value}`);
+        track(reactiveObj, key);
+        return value;
       },
-      set(newValue){
-        console.log(`Setting value, ${newValue}`)
-        value = newValue
-        renderApp()
-      }
-    })
-  }) 
+      set(newValue) {
+        console.log(`Setting value, ${newValue}`);
+        if (newValue !== value) {
+          value = newValue;
+          trigger(reactiveObj, key);
+          renderApp();
+        }
+      },
+    });
+  });
 
+  function track(target, key){
+    console.log(target, key)
+  }
+  function trigger(target, key){
+    console.log(target, key)
+  }
 
-  return reactiveObj
+  return reactiveObj;
 }
