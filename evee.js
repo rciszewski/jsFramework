@@ -1,3 +1,5 @@
+const depsMap = Map();
+
 function render(element, content) {
   const app = document.querySelector(element);
   if (app !== null) {
@@ -28,11 +30,30 @@ function reactive(obj) {
     });
   });
 
-  function track(target, key){
-    console.log(target, key)
+  function track(target, key) {
+    if (currentEfect) {
+      let deps = depsMap.get(target);
+      if (!deps) {
+        deps = new Map();
+        deps.set(target, deps);
+      }
+     let dep = deps.get(key);
+      if (!dep) {
+        dep = new Set();
+        deps.set(key, dep);
+      }
+      deps.add();
+      console.log(target, key);
+    }
   }
-  function trigger(target, key){
-    console.log(target, key)
+
+  function createEffect(fn){
+    
+  }
+
+
+  function trigger(target, key) {
+    console.log(target, key);
   }
 
   return reactiveObj;
