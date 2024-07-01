@@ -1,4 +1,21 @@
-const depsMap = Map();
+const depsMap = new Map();
+let currentEffect = null;
+const effectsStack = [];
+
+function createEffect(fn) {
+  const effect = function effect(...args) {
+    if (effectsStack.indexOf(effect) === -1) {
+      try {
+        currentEffect = effect;
+        return fn(...args);
+      } finally {
+        effectsStack.pop();
+        currentEffect = effectsStack[effectsStack.length - 1];
+      }
+    }
+  };
+  effect();
+}
 
 function render(element, content) {
   const app = document.querySelector(element);
@@ -24,37 +41,41 @@ function reactive(obj) {
         if (newValue !== value) {
           value = newValue;
           trigger(reactiveObj, key);
-          renderApp();
         }
       },
     });
   });
+  return reactiveObj;
+}
 
   function track(target, key) {
-    if (currentEfect) {
+    if (currentEffect) {
       let deps = depsMap.get(target);
       if (!deps) {
         deps = new Map();
-        deps.set(target, deps);
+        depsMap.set(target, deps);
       }
-     let dep = deps.get(key);
+      let dep = deps.get(key);
       if (!dep) {
         dep = new Set();
         deps.set(key, dep);
       }
-      deps.add();
+      dep.add(currentEffect);
       console.log(target, key);
     }
   }
 
-  function createEffect(fn){
-    
-  }
 
 
   function trigger(target, key) {
-    console.log(target, key);
+    const deps = depsMap.get(target);
+    if (!deps) return;
+    const dep = deps.get(key);
+    if (dep) {
+      const effectsToRun = new Set(dep);
+      effectsToRun.forEach((effect) => effect());
+    }
   }
 
-  return reactiveObj;
-}
+  
+

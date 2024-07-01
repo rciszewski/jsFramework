@@ -33,7 +33,11 @@ function fetchWeather(city) {
   }, 100);
 }
 
-function renderApp() {
+createEffect(function () {
+  fetchWeather(state.selectedCity);
+});
+
+createEffect(() => {
   render(
     "#container",
     `<select onChange=updateSelectedCity(this.value)>
@@ -48,15 +52,10 @@ function renderApp() {
   </div>
   `
   );
-}
+})
 
 function updateSelectedCity(city) {
   state.selectedCity = city;
   fetchWeather(city);
 }
 
-renderApp();
-
-setTimeout(() => {
-  state.message = "Hello World";
-}, 1000);
